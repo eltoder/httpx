@@ -220,9 +220,10 @@ def get_environment_proxies() -> dict[str, str | None]:
             # proxies.
             return {}
         elif hostname:
-            # NO_PROXY=.google.com is marked as "all://*.google.com,
+            # NO_PROXY=.google.com is marked as "all://*.google.com",
             #   which disables "www.google.com" but not "google.com"
-            # NO_PROXY=google.com is marked as "all://*google.com,
+            # NO_PROXY=*.google.com is the same as NO_PROXY=.google.com
+            # NO_PROXY=google.com is marked as "all://*google.com",
             #   which disables "www.google.com" and "google.com".
             #   (But not "wwwgoogle.com")
             # NO_PROXY can include domains, IPv6, IPv4 addresses and "localhost"
@@ -233,7 +234,7 @@ def get_environment_proxies() -> dict[str, str | None]:
                 mounts[f"all://{hostname}"] = None
             elif is_ipv6_hostname(hostname):
                 mounts[f"all://[{hostname}]"] = None
-            elif hostname.lower() == "localhost":
+            elif hostname.lower() == "localhost" or hostname.startswith("*"):
                 mounts[f"all://{hostname}"] = None
             else:
                 mounts[f"all://*{hostname}"] = None
